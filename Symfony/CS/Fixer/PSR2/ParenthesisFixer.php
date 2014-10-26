@@ -31,6 +31,10 @@ class ParenthesisFixer extends AbstractFixer
         $tokens = Tokens::fromCode($content);
 
         foreach ($tokens as $index => $token) {
+            if (!$token->equals('(')) {
+                continue;
+            }
+
             $prevIndex = $tokens->getPrevNonWhitespace($index);
 
             // ignore parenthesis for T_ARRAY
@@ -38,12 +42,10 @@ class ParenthesisFixer extends AbstractFixer
                 continue;
             }
 
-            if ($token->equals('(')) {
-                $endIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+            $endIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
 
-                $this->removeSpaceAroundToken($tokens, $index, 1);
-                $this->removeSpaceAroundToken($tokens, $endIndex, -1);
-            }
+            $this->removeSpaceAroundToken($tokens, $index, 1);
+            $this->removeSpaceAroundToken($tokens, $endIndex, -1);
         }
 
         return $tokens->generateCode();
